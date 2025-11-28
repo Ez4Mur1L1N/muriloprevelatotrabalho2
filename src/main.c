@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "leitorGeo.h"
-//#include "leitorQry.h" ainda não existe!
+#include "leitorQry.h" 
 #include "svg.h"
 #include "lista.h"
 #include "tipos.h"
@@ -60,34 +60,6 @@ int main(int argc, char *argv[]) {
     char caminhoSvg[512];
     sprintf(caminhoSvg, "%s/%s.svg", dirSaida, nomeBase);
 
-char caminhoTxt[512];
-    char nomeQrySemExt[256];
-    nomeQrySemExt[0] = '\0'; 
-
-    if (arqQryNome != NULL) {
-        
-        char* barraQry = strrchr(arqQryNome, '/');
-        char* inicioNomeQry;
-
-        if (barraQry != NULL) {
-            inicioNomeQry = barraQry + 1;
-        } else {
-            inicioNomeQry = arqQryNome;
-        }
-        
-        strcpy(nomeQrySemExt, inicioNomeQry); 
-
-        char* pontoQry = strrchr(nomeQrySemExt, '.');
-        if (pontoQry != NULL) {
-            *pontoQry = '\0'; 
-        }
-        snprintf(caminhoTxt, sizeof(caminhoTxt), "%s/%s-%s.txt", dirSaida, nomeBase, nomeQrySemExt);
-        
-    } else {
-        snprintf(caminhoTxt, sizeof(caminhoTxt), "%s/%s.txt", dirSaida, nomeBase); 
-    }
-
-
     // Execução Principal
     printf("Lendo arquivo GEO: %s\n", caminhoGeo);
     ListaFormas formas = lerArqGeo(caminhoGeo);
@@ -103,11 +75,32 @@ char caminhoTxt[512];
         printf("Erro ao abrir/criar arquivo SVG!\n");
     }
 
-    // Processamento de Consultas 
+    if (arqQryNome != NULL) {
+        char caminhoQry[512];
+        if (dirEntrada != NULL) {
+            sprintf(caminhoQry, "%s/%s", dirEntrada, arqQryNome);
+        } else {
+            strcpy(caminhoQry, arqQryNome);
+        }
 
-    // Desenvolvimento do qry...
+        char nomeQryBase[256];
+        char* barra = strrchr(arqQryNome, '/');
+        char* inicio = (barra != NULL) ? barra + 1 : arqQryNome;
+        strcpy(nomeQryBase, inicio);
+        char* ponto = strrchr(nomeQryBase, '.');
+        if (ponto != NULL) *ponto = '\0';
 
-    // printf("\nProcesso concluido!\n");
+        char caminhoTxt[512];
+        sprintf(caminhoTxt, "%s/%s-%s.txt", dirSaida, nomeBase, nomeQryBase);
+
+        printf("Processando consultas: %s\n", caminhoQry);
+        printf("Gerando relatorio: %s\n", caminhoTxt);
+
+
+        lerArqQry(formas, caminhoQry, caminhoTxt, dirSaida);
+    }
+
+    printf("\nProcesso concluido!\n");
 
     // Limpeza Final
     printf("Liberando memoria das formas...\n");
