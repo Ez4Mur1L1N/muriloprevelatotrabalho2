@@ -13,6 +13,7 @@ int main(int argc, char *argv[]) {
     char* arqGeoNome = NULL;
     char* dirSaida = NULL;
     char* arqQryNome = NULL;
+    int limitInsertion = 10;//valor padrão definido.
 
     // Processamento dos Argumentos da Linha de Comando 
     for (int i = 1; i < argc; i++) {
@@ -24,6 +25,8 @@ int main(int argc, char *argv[]) {
             dirSaida = argv[++i];
         } else if (strcmp(argv[i], "-q") == 0 && i + 1 < argc) {
             arqQryNome = argv[++i];
+        } else if (strcmp(argv[i], "-i") == 0 && i + 1 < argc) {
+            limitInsertion = atoi(argv[++i]);
         }
     }
 
