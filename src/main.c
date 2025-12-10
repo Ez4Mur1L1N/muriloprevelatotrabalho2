@@ -13,6 +13,7 @@ int main(int argc, char *argv[]) {
     char* arqGeoNome = NULL;
     char* dirSaida = NULL;
     char* arqQryNome = NULL;
+    char* metodoOrd = "q";
     int limitInsertion = 10;//valor padrão definido.
 
     // Processamento dos Argumentos da Linha de Comando 
@@ -25,6 +26,8 @@ int main(int argc, char *argv[]) {
             dirSaida = argv[++i];
         } else if (strcmp(argv[i], "-q") == 0 && i + 1 < argc) {
             arqQryNome = argv[++i];
+        } else if (strcmp(argv[i], "-to") == 0 && i + 1 < argc){
+            metodoOrd = argv[++i];
         } else if (strcmp(argv[i], "-i") == 0 && i + 1 < argc) {
             limitInsertion = atoi(argv[++i]);
         }
@@ -100,7 +103,7 @@ int main(int argc, char *argv[]) {
         printf("Gerando relatorio: %s\n", caminhoTxt);
 
 
-        lerArqQry(formas, caminhoQry, caminhoTxt, dirSaida);
+        lerArqQry(formas, caminhoQry, caminhoTxt, dirSaida, nomeBase, caminhoSvg, metodoOrd, limitInsertion);
     }
 
     printf("\nProcesso concluido!\n");

@@ -6,11 +6,16 @@
 #include "lista.h"
 #include "segmento.h"
 #include "tipos.h"
+#include "arvore.h"
+#include "sort.h"
+#include "svg.h"
+#include "visibilidade.h"
 
 #include "circulo.h"
 #include "retangulo.h"
 #include "linha.h"
 #include "texto.h"
+#include "formas.h"
 
 typedef struct{
     int id;
@@ -28,7 +33,7 @@ const char* getNomeTipo(TipoForma t) {
     }
 }
 
-void lerArqQry(ListaFormas formas, char* caminhoQry, char* caminhoTxt, char* dirSaida){
+void lerArqQry(ListaFormas formas, char* caminhoQry, char* caminhoTxt, char* dirSaida, char* nomeBaseGeo, char* arqSvgPrincipal, char* metodoOrd, int limitInsertion){
     FILE* arqQry = fopen(caminhoQry, "r");
     if (arqQry == NULL) {
         printf("Nao foi possivel abrir o arquivo de consultas em %s!\n", caminhoQry);
@@ -47,12 +52,12 @@ void lerArqQry(ListaFormas formas, char* caminhoQry, char* caminhoTxt, char* dir
 
     char linha[256];
     while(fgets(linha, sizeof(linha), arqQry)){
-        char comando[5];
+        char comando[10];
         sscanf(linha, "%s", comando);
 
         if(strcmp(comando, "a") == 0){
             int IdIni, IdFim; // Faixa de comparação de IDs.
-            char orienSegCirculo[5]; // **Tratar caso círculo (v/h).
+            char orienSegCirculo[10]; // **Tratar caso círculo (v/h).
             strcpy(orienSegCirculo, "");
 
             sscanf(linha, "a %d %d %s", &IdIni, &IdFim, orienSegCirculo); 
@@ -145,15 +150,26 @@ void lerArqQry(ListaFormas formas, char* caminhoQry, char* caminhoTxt, char* dir
 
                     if(deveRemoverOriginal){
                         removeNoLista(formas, noAtual);
-                        switch(tipoOrig){
-                            case CIRCULO: killCirculo(forma); break;
-                            case RETANGULO: killRetangulo(forma); break;
-                            case TEXTO: killTexto(forma); break;
-                            default: break;
-                        }
+                        killFormaGenerica(forma, tipoOrig);
                     }
                 }
                 noAtual = proximoNo;
+            }
+        } else if(strcmp(comando, "d") == 0 || strcmp(comando, "p") == 0 || strcmp(comando, "cln") == 0){
+            double x, y;
+            char sfx[100];
+            char cor[100];
+            double dx = 0, dy = 0;
+
+            if(strcmp(comando, "d") == 0){
+                sscanf(linha, "d %lf %lf %s", &x, &y, sfx);
+                calcularVisibilidadeEProcessar(listaSegmento, formas, x, y, metodoOrd, limitInsertion, "d", sfx, dirSaida, nomeBaseGeo, arqSvgPrincipal, arqTxt, NULL, 0, 0);
+            } else if(strcmp(comando, "p") == 0){
+                sscanf(linha, "p %lf %lf %s %s", &x, &y, cor, sfx);
+                calcularVisibilidadeEProcessar(listaSegmento, formas, x, y, metodoOrd, limitInsertion, "p", sfx, dirSaida, nomeBaseGeo, arqSvgPrincipal, arqTxt, cor, 0, 0);
+            } else if(strcmp(comando, "cln") == 0){
+                sscanf(linha, "cln %lf %lf %lf %lf %s", &x, &y, &dx, &dy, sfx);
+                calcularVisibilidadeEProcessar(listaSegmento, formas, x, y, metodoOrd, limitInsertion, "cln", sfx, dirSaida, nomeBaseGeo, arqSvgPrincipal, arqTxt, NULL, dx, dy);
             }
         }
     }

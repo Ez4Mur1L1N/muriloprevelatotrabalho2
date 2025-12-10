@@ -15,13 +15,17 @@ Comandos suportados:
 typedef void* ListaFormas; 
 
 /**
- * @brief Processa o arquivo .qry, executando as simulações de bombas.
+ * @brief 
  * 
  * @param formas A lista original de formas (Círculos, Retângulos, etc).
  * @param caminhoQry Caminho completo do arquivo .qry.
  * @param caminhoTxt Caminho completo para salvar o relatório .txt.
- * @param dirSaida Diretório para salvar os SVGs de visibilidade (***obs: quando sfx != "-").
+ * @param dirSaidaO Diretório para para a pasta onde os arquivos da saída serão designados
+ * @param nomeBaseGeo Ajuda na montagem dos caminhos para a saída.
+ * @param arqSvgPrincipal caminho do svg principal.
+ * @param metodoOrd String do algoritmo de ordenação que vai ser usado.
+ * @param limitInsertion Limite para o uso do insertion sort.
  */
-void lerArqQry(ListaFormas formas, char* caminhoQry, char* caminhoTxt, char* dirSaida);
+void lerArqQry(ListaFormas formas, char* caminhoQry, char* caminhoTxt, char* dirSaida, char* nomeBaseGeo, char* arqSvgPrincipal, char* metodoOrd, int limitInsertion);
 
 #endif

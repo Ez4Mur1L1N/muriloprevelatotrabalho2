@@ -212,7 +212,7 @@ void setCorPTexto(Texto t, char *corPNova) {
     strcpy(te->corPr, corPNova);
 }
 
-Texto clonarTexto(Texto t, int IDnovo){
+Texto clonarTexto(Texto t, int IDnovo, double dx, double dy){
     TEXTOT* te = (TEXTOT*) t;
     if(te == NULL){
         return NULL;
@@ -226,8 +226,8 @@ Texto clonarTexto(Texto t, int IDnovo){
 
     clone->id = IDnovo;
     clone->tipo = te->tipo;
-    clone->x = te->x;
-    clone->y = te->y;
+    clone->x = te->x + dx;
+    clone->y = te->y + dy;
 
     clone->corBo = (char*) malloc(strlen(te->corBo) + 1);
     clone->corPr = (char*) malloc(strlen(te->corPr) + 1);

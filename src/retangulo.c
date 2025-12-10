@@ -163,7 +163,7 @@ void setCorPRetangulo(Retangulo r, char *corPNova){
     strcpy(re->corPr, corPNova);
 }
 
-Retangulo clonarRetangulo(Retangulo r, int IDnovo){
+Retangulo clonarRetangulo(Retangulo r, int IDnovo, double dx, double dy){
     RETANGULOR* re = (RETANGULOR*) r;
     if(re == NULL){
         return NULL;
@@ -177,8 +177,8 @@ Retangulo clonarRetangulo(Retangulo r, int IDnovo){
 
     clone->id = IDnovo;
     clone->tipo = re->tipo;
-    clone->x = re->x;
-    clone->y = re->y;
+    clone->x = re->x + dx;
+    clone->y = re->y + dy;
     clone->h = re->h;
     clone->w = re->w;
     clone->corBo = (char*) malloc(strlen(re->corBo) + 1);

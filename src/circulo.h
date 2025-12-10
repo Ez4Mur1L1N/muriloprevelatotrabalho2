@@ -141,9 +141,11 @@ void setCorPCirculo(Circulo c, char *corPNova);
  * 
  * @param Circulo Ponteiro do círculo original analisado. 
  * @param IDnovo Novo ID (único) para o clone.
+ * @param dx Deslocamento no eixo x.
+ * @param dy Deslocamento no eixo y.
  *  
  * @return Ponteiro para a nova forma clonada. 
  */
-Circulo clonarCirculo(Circulo c, int IDnovo);
+Circulo clonarCirculo(Circulo c, int IDnovo, double dx, double dy);
 
 #endif

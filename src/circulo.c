@@ -156,7 +156,7 @@ void setCorPCirculo(Circulo c, char *corPNova){
     strcpy(ci->corPr, corPNova);
 }
 
-Circulo clonarCirculo(Circulo c, int IDnovo){
+Circulo clonarCirculo(Circulo c, int IDnovo, double dx, double dy){
     CIRCULOC* ci = (CIRCULOC*) c;
     if(ci == NULL){
         return NULL;
@@ -170,8 +170,8 @@ Circulo clonarCirculo(Circulo c, int IDnovo){
 
     clone->id = IDnovo;
     clone->tipo = ci->tipo;
-    clone->x = ci->x;
-    clone->y = ci->y;
+    clone->x = ci->x + dx;
+    clone->y = ci->y + dy;
     clone->r = ci->r;
     clone->corBo = (char*) malloc(strlen(ci->corBo) + 1);
     clone->corPr = (char*) malloc(strlen(ci->corPr) + 1);

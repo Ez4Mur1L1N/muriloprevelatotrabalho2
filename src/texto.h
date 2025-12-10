@@ -174,9 +174,11 @@ void setCorPTexto(Texto t, char *corPNova);
  * 
  * @param Linha Ponteiro do texto original analisado. 
  * @param IDnovo Novo ID (único) para o clone.
+ * @param dx Deslocamento no eixo x.
+ * @param dy Deslocamento no eixo y.
  *  
  * @return Ponteiro para a nova forma clonada. 
  */
-Texto clonarTexto(Texto t, int IDnovo);
+Texto clonarTexto(Texto t, int IDnovo, double dx, double dy);
 
 #endif

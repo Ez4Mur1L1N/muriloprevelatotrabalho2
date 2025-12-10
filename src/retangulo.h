@@ -151,9 +151,11 @@ void setCorPRetangulo(Retangulo r, char *corPNova);
  * 
  * @param Retangulo Ponteiro do retângulo original analisado. 
  * @param IDnovo Novo ID (único) para o clone.
+ * @param dx Deslocamento no eixo x.
+ * @param dy Deslocamento no eixo y.
  *  
  * @return Ponteiro para a nova forma clonada. 
  */
-Retangulo clonarRetangulo(Retangulo r, int IDnovo);
+Retangulo clonarRetangulo(Retangulo r, int IDnovo, double dx, double dy);
 
 #endif

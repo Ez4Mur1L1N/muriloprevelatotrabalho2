@@ -77,5 +77,16 @@ void desenhaRetanguloSVG(FILE* arqSVG, Retangulo r);
  */
 void desenhaTextoSVG(FILE* arqSVG, Texto t);
 
+/**
+ * @brief Função que desenha um polígono genérico no arquivo SVG a partir de uma lista de Pontos.
+ * 
+ * @param arqSVG Ponteiro para o arquivo SVG aberto.
+ * @param listaPontos Lista que contém os pontos do polígono.
+ * @param corPreenchimento Cor de preenchimento.
+ * @param corContorno Cor de contorno.
+ * @param opacidade Opacidade.
+ */
+void desenhaPoligonoSVG(FILE* arqSVG, Lista listaPontos, const char* corPreenchimento, const char* corContorno, double opacidade);
+
 
 #endif

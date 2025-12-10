@@ -11,6 +11,10 @@ typedef struct{
     TipoForma tipo;
 } FormaGenerica;
 
+typedef struct{
+    double x, y;
+} Ponto;
+
 
 void abreSVG(FILE* arqSVG){
     if(arqSVG == NULL){
@@ -121,4 +125,19 @@ void desenhaTextoSVG(FILE* arqSVG, Texto t){
             getFontSizeTexto(t),
             OPACIDADE,
             getTexto_Texto(t));
+}
+
+void desenhaPoligonoSVG(FILE* arqSVG, Lista listaPontos, const char* corPreenchimento, const char* corContorno, double opacidade) {
+    if (!arqSVG || getTamanhoLista(listaPontos) < 3) return;
+
+    fprintf(arqSVG, "\t<polygon points=\"");
+    No no = getPrimeiroNoLista(listaPontos);
+    
+    // Constrói a string de pontos
+    while(no != NULL) {
+        Ponto* p = (Ponto*) getConteudoNoLista(no); 
+        fprintf(arqSVG, "%.2f,%.2f ", p->x, p->y);
+        no = getProximoNoLista(no);
+    }
+    fprintf(arqSVG, "\" style=\"fill:%s;stroke:%s;stroke-width:2;fill-opacity:%.2f\" />\n", corPreenchimento, corContorno, opacidade);
 }

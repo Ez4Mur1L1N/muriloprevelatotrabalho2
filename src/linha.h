@@ -149,9 +149,11 @@ void setCorLinha(Linha l, char *corNova);
  * 
  * @param Linha Ponteiro da linha original analisada. 
  * @param IDnovo Novo ID (único) para o clone.
+ * @param dx Deslocamento no eixo x.
+ * @param dy Deslocamento no eixo y.
  *  
  * @return Ponteiro para a nova forma clonada. 
  */
-Linha clonarLinha(Linha l, int IDnovo);
+Linha clonarLinha(Linha l, int IDnovo, double dx, double dy);
 
 #endif

@@ -149,7 +149,7 @@ void setCorLinha(Linha l, char *corNova){
     strcpy(li->cor, corNova);
 }
 
-Linha clonarLinha(Linha l, int IDnovo){
+Linha clonarLinha(Linha l, int IDnovo, double dx, double dy){
     LINHAL* li = (LINHAL*) l;
     if(li == NULL){
         return NULL;
@@ -163,10 +163,10 @@ Linha clonarLinha(Linha l, int IDnovo){
 
     clone->id = IDnovo;
     clone->tipo = li->tipo;
-    clone->x1 = li->x1;
-    clone->y1 = li->y1;
-    clone->x2 = li->x2;
-    clone->y2 = li->y2;
+    clone->x1 = li->x1 + dx;
+    clone->y1 = li->y1 + dy;
+    clone->x2 = li->x2 + dx;
+    clone->y2 = li->y2 + dy;
     clone->cor = (char*) malloc(strlen(li->cor) + 1);
 
     if (clone->cor == NULL) {

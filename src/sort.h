@@ -26,9 +26,10 @@ VetorVertices criarVetorVertices(Lista listaSegmentos, double xBomba, double yBo
  * @brief Função que vai ordenar o vetor de vértices utilizando o algoritmo merge (com a otimização do insertion).
  * 
  * @param vetor Ponteiro para o vetor.
+ * @param metodo String que vai definir o algoritmo de ordenação: "m" - Merge / "q" - Quick.
  * @param limitInsertion valor para se usar o Insertion sort (parâmetro -i)
  */
-void mergeSortVertices(VetorVertices vetor, int limitInsertion);
+void ordenarVertices(VetorVertices vetor, char *metodo, int limitInsertion);
 
 /**
  * @brief Função que libera toda a memória alocada para o vetor.

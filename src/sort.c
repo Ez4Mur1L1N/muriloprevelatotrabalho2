@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 #include "sort.h"
 #include "segmento.h"
 
@@ -86,6 +87,17 @@ void mergeSortRecursivo(Vertice *vet, int esquerda, int direita, int limitInsert
     }
 }
 
+// Função de comparação do QuickSort
+
+int compararQuickSort(const void *a, const void *b){
+    Vertice* v1 = (Vertice*) a;
+    Vertice* v2 = (Vertice*) b;
+
+    if(v1->angulo < v2->angulo) return -1;
+    if(v1->angulo > v2->angulo) return 1;
+    return 0;
+}
+
 // Funções públicas.
 
 VetorVertices criarVetorVertices(Lista listaSegmentos, double xBomba, double yBomba){
@@ -146,13 +158,17 @@ VetorVertices criarVetorVertices(Lista listaSegmentos, double xBomba, double yBo
     return (VetorVertices) v;
 }
 
-void mergeSortVertices(VetorVertices vetor, int limitInsertion) {
+void ordenarVertices(VetorVertices vetor, char *metodo, int limitInsertion) {
     vetorVERTICES* v = (vetorVERTICES*) vetor;
     if (v == NULL || v->array == NULL || v->qtd <= 1){
         return;
     } 
-    // Chama a função recursiva interna.
-    mergeSortRecursivo(v->array, 0, v->qtd - 1, limitInsertion);
+    // Verifica se o método é "m" (Merge) ou "q" (Quick, padrão dentro da convenção do projeto).
+    if(strcmp(metodo, "m") == 0){
+        mergeSortRecursivo(v->array, 0, v->qtd - 1, limitInsertion);
+    } else{
+        qsort(v->array, v->qtd, sizeof(Vertice), compararQuickSort);
+    }
 }
 
 void killVetorVertices(VetorVertices vetor){
