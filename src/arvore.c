@@ -18,31 +18,40 @@ typedef struct{
 
 // Funções auxiliares que vão amparar o cálculo da distância da bomba até o ponto onde corta o segmento.
 
+double distSq(double x1, double y1, double x2, double y2){
+    return (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2);
+}
+
 double obterDistancia(double xBomba, double yBomba, Segmento seg){
     double x1 = getX1Segmento(seg);
     double y1 = getY1Segmento(seg);
     double x2 = getX2Segmento(seg);
     double y2 = getY2Segmento(seg);
 
-    // Se o segmento é um ponto (degenerado), retorna distância euclidiana
-    if (fabs(x1 - x2) < 1e-9 && fabs(y1 - y2) < 1e-9) {
-        return hypot(x1 - xBomba, y1 - yBomba);
-    }
+    double l2 = distSq(x1, y1, x2, y2);
 
-    // Fórmula da distância de ponto a reta:
-    // |Ax + By + C| / sqrt(A^2 + B^2)
-    // Reta: (y1-y2)x + (x2-x1)y + (x1y2 - x2y1) = 0
+    // Se o segmento é apenas um ponto
+    if(l2 == 0.0) return sqrt(distSq(xBomba, yBomba, x1, y1));
 
-    double a = y1 - y2;
-    double b = x2 - x1;
-    double c = x1 * y2 - x2 * y1;
-    double dist = fabs(a * xBomba + b * yBomba + c) / sqrt(a*a + b*b);
-    return dist;
+    double t = ((xBomba - x1) * (x2 - x1) + (yBomba - y1) * (y2 - y1)) / l2;
+    if(t < 0.0) t = 0.0;
+    else if(t > 1.0) t = 1.0;
+
+    double xProj = x1 + t *(x2 - x1);
+    double yProj = y1 + t *(y2 - y1);
+
+    return sqrt(distSq(xBomba, yBomba, xProj, yProj));
 }
 
 int compararSegmentos(Segmento segA, Segmento segB, double xBomba, double yBomba){
     double distA = obterDistancia(xBomba, yBomba, segA);
     double distB = obterDistancia(xBomba, yBomba, segB);
+
+    // --- DEBUG TEMPORÁRIO (Remova depois) ---
+    // Vamos printar apenas se a distância for pequena, para não poluir demais
+    if (distA < 100 && distB < 100) {
+        printf("COMP: SegID %d (Dist %.2f) vs SegID %d (Dist %.2f)\n", getIDSegmento(segA), distA, getIDSegmento(segB), distB);
+    }
 
     // Para tratar distâncias muito pequenas(ou seja, iguais).
     if(fabs(distA - distB)< 1e-9){

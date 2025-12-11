@@ -16,6 +16,10 @@
 #include "texto.h"
 #include "formas.h"
 
+#ifndef M_PI
+#define M_PI 3.14159265359
+#endif
+
 // Estrutura auxiliar para guardar um ponto.
 typedef struct{
     double x, y;
@@ -110,6 +114,20 @@ void calcularVisibilidadeEProcessar(Lista listaSegmentos, Lista listaFormas, dou
         fprintf(arqTxt," Resultados:\n");
     }
     
+    double minX = -500.0, minY = -500.0;
+    double maxX = 2000.0, maxY = 2000.0;
+
+    Segmento bbox[4];
+    bbox[0] = criarSegmento(-1, minX, minY, maxX, minY); // baixo.
+    bbox[1] = criarSegmento(-2, maxX, minY, maxX, maxY); // direita.
+    bbox[2] = criarSegmento(-3, maxX, maxY, minX, maxY); // cima.
+    bbox[3] = criarSegmento(-4, minX, maxY, minX, minY); // esquerda.
+
+    for(int i = 0; i < 4; i++){
+        insereFinalLista(listaSegmentos, bbox[i]);
+    }
+
+
     VetorVertices eventos = criarVetorVertices(listaSegmentos, xBomba, yBomba);
     ordenarVertices(eventos, metodoOrd, limitInsertion);
     Arvore ativos = criarArvore(xBomba, yBomba);
@@ -117,52 +135,83 @@ void calcularVisibilidadeEProcessar(Lista listaSegmentos, Lista listaFormas, dou
 
     int qtdEventos = getTamanhoVetor(eventos);
 
-    for(int i = 0; i < qtdEventos; i++){
-        double xVert = getXVertice(eventos, i);
-        double yVert = getYVertice(eventos, i);
-        int idSeg = getIdSegVertice(eventos, i);
-        int ehInicio = getInicioVertice(eventos, i);
+    int i = 0;
+    int primeiraPassada = 1; // Flag para controlar o início.
+    Segmento ultimoObstaculo = NULL; 
 
-        Segmento segEvento = buscarSegmentoPorID(listaSegmentos, idSeg);
-        if(!segEvento) continue; // Segurança.
+    while(i < qtdEventos){
+        double anguloAtual = getAnguloVertice(eventos, i);
+        double xVertRef = getXVertice(eventos, i);
+        double yVertRef = getYVertice(eventos, i);
 
-        // Obstáculo antes da mudança.
-        Segmento obstaculoAntes = getSegMaisProx(ativos);
+        int j = i;
+        while(j < qtdEventos){
+            if(fabs(getAnguloVertice(eventos, j) - anguloAtual) > 1e-9) break;
 
-        // Atualiza a árvore.
-        if(ehInicio){
-            inserirSegmentoArvore(ativos, segEvento);
-        } else{
-            removerSegmentoArvore(ativos, segEvento);
+            int idSeg = getIdSegVertice(eventos, j);
+            int ehInicio = getInicioVertice(eventos, j);
+            Segmento segEvento = buscarSegmentoPorID(listaSegmentos, idSeg);
+            
+            if(segEvento){
+                if(ehInicio) inserirSegmentoArvore(ativos, segEvento);
+                else removerSegmentoArvore(ativos, segEvento);
+            }
+            
+            // Atualiza referência para o vértice mais recente do lote.
+            xVertRef = getXVertice(eventos, j);
+            yVertRef = getYVertice(eventos, j);
+            j++;
         }
 
-        // Obstáculo depois da mudança.
-        Segmento obstaculoDepois = getSegMaisProx(ativos);
+        Segmento obstaculoAtual = getSegMaisProx(ativos);
 
-        if(obstaculoAntes != obstaculoDepois){
-            Ponto* p1 = malloc(sizeof(Ponto));
-            if(obstaculoAntes != NULL){
-                *p1 = calcularInterseccao(xBomba, yBomba, xVert, yVert, obstaculoAntes);
-            } else{
-                p1->x = xVert; 
-                p1->y = yVert;
+        if(primeiraPassada){
+            // CASO ESPECIAL: Primeira iteração (ângulo 0)
+            // Apenas registramos o ponto inicial do polígono no obstáculo atual.
+            Ponto* p = malloc(sizeof(Ponto));
+            if(obstaculoAtual != NULL){
+                *p = calcularInterseccao(xBomba, yBomba, xVertRef, yVertRef, obstaculoAtual);
+            } else {
+                p->x = xVertRef; p->y = yVertRef;
             }
-            insereFinalLista(poligono, p1);
+            insereFinalLista(poligono, p);
+            
+            primeiraPassada = 0; // Desliga a flag.
+        } 
+        else {
+            // CASO NORMAL: Compara com o último obstáculo processado.
+            if(ultimoObstaculo != obstaculoAtual){
+                
+                // Ponto 1: Onde o raio batia no obstáculo VELHO (usando ângulo NOVO).
+                Ponto* p1 = malloc(sizeof(Ponto));
+                if(ultimoObstaculo != NULL){
+                    *p1 = calcularInterseccao(xBomba, yBomba, xVertRef, yVertRef, ultimoObstaculo);
+                } else{
+                    p1->x = xVertRef; p1->y = yVertRef;
+                }
+                insereFinalLista(poligono, p1);
 
-            Ponto* p2 = malloc(sizeof(Ponto));
-            if(obstaculoDepois != NULL){
-                *p2 = calcularInterseccao(xBomba, yBomba, xVert, yVert, obstaculoDepois);
-            } else{
-                p2->x = xVert;
-                p2->y = yVert;
-            }
-            // Só vai inserir p2 se for geometricamente diferente de p1
-            if(fabs(p1->x - p2->x) > 1e-5 || fabs(p1->y - p2->y) > 1e-5){
-                insereFinalLista(poligono, p2);
-            } else{
-                free(p2);
+                if(anguloAtual < 2 * M_PI - 1e-4){
+                    // Ponto 2: Onde o raio bate no obstáculo NOVO (usando ângulo NOVO).
+                    Ponto* p2 = malloc(sizeof(Ponto));
+                    if(obstaculoAtual != NULL){
+                        *p2 = calcularInterseccao(xBomba, yBomba, xVertRef, yVertRef, obstaculoAtual);
+                    } else{
+                        p2->x = xVertRef; p2->y = yVertRef;
+                    }
+                
+                    // Evita duplicar pontos idênticos.
+                    if(fabs(p1->x - p2->x) > 1e-5 || fabs(p1->y - p2->y) > 1e-5){
+                        insereFinalLista(poligono, p2);
+                    } else{     
+                        free(p2);
+                    }
+                }
             }
         }
+
+        ultimoObstaculo = obstaculoAtual;
+        i = j;
     }
 
     char caminhoSvgFinal[512];
@@ -231,6 +280,19 @@ void calcularVisibilidadeEProcessar(Lista listaSegmentos, Lista listaFormas, dou
 
     killVetorVertices(eventos);
     killArvore(ativos);
+
+    No noRemover = getPrimeiroNoLista(listaSegmentos);
+    while(noRemover != NULL){
+        No proximo = getProximoNoLista(noRemover);
+        Segmento sRemover = (Segmento) getConteudoNoLista(noRemover);
+        int idR = getIDSegmento(sRemover);
+        if(idR < 0){
+            removeNoLista(listaSegmentos, noRemover);
+            killSegmento(sRemover);
+        }
+        noRemover = proximo;
+    }
+
     No noP = getPrimeiroNoLista(poligono);
     while(noP != NULL){
         Ponto* p = (Ponto*) getConteudoNoLista(noP);

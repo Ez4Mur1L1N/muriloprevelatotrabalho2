@@ -63,22 +63,22 @@ int main(int argc, char *argv[]) {
         *ponto = '\0';
     }
     
-    char caminhoSvg[512];
-    sprintf(caminhoSvg, "%s/%s.svg", dirSaida, nomeBase);
+    char caminhoSvgInicial[512];
+    sprintf(caminhoSvgInicial, "%s/%s.svg", dirSaida, nomeBase);
 
     // Execução Principal
     printf("Lendo arquivo GEO: %s\n", caminhoGeo);
     ListaFormas formas = lerArqGeo(caminhoGeo);
 
-    printf("Gerando SVG inicial: %s\n", caminhoSvg);
-    FILE* arqSvg = fopen(caminhoSvg, "w");
+    printf("Gerando SVG inicial: %s\n", caminhoSvgInicial);
+    FILE* arqSvg = fopen(caminhoSvgInicial, "w");
     if(arqSvg != NULL){
         abreSVG(arqSvg);
         processarListaSvg(arqSvg, formas);
         fechaSVG(arqSvg);
         fclose(arqSvg);
     } else{
-        printf("Erro ao abrir/criar arquivo SVG!\n");
+        printf("Erro ao abrir/criar arquivo SVG inicial!\n");
     }
 
     if (arqQryNome != NULL) {
@@ -99,12 +99,30 @@ int main(int argc, char *argv[]) {
         char caminhoTxt[512];
         sprintf(caminhoTxt, "%s/%s-%s.txt", dirSaida, nomeBase, nomeQryBase);
 
+        char caminhoSvgFinal[512];
+        sprintf(caminhoSvgFinal, "%s/%s-%s.svg", dirSaida, nomeBase, nomeQryBase);
+
         printf("Processando consultas: %s\n", caminhoQry);
         printf("Gerando relatorio: %s\n", caminhoTxt);
+        printf("Preparando SVG Final: %s\n", caminhoSvgFinal);
 
+        FILE* svgFinalBase = fopen(caminhoSvgFinal, "w");
+        if(svgFinalBase){
+            abreSVG(svgFinalBase);
+            processarListaSvg(svgFinalBase, formas);
+            fclose(svgFinalBase);
+        }
 
-        lerArqQry(formas, caminhoQry, caminhoTxt, dirSaida, nomeBase, caminhoSvg, metodoOrd, limitInsertion);
+        lerArqQry(formas, caminhoQry, caminhoTxt, dirSaida, nomeBase, caminhoSvgFinal, metodoOrd, limitInsertion);
+        
+        FILE* svgFinalFim = fopen(caminhoSvgFinal, "a");
+        if(svgFinalFim){
+            fechaSVG(svgFinalFim);
+            fclose(svgFinalFim);
+        }
     }
+
+
 
     printf("\nProcesso concluido!\n");
 

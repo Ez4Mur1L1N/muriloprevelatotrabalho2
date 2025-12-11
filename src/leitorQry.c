@@ -72,7 +72,6 @@ void lerArqQry(ListaFormas formas, char* caminhoQry, char* caminhoTxt, char* dir
                 TipoForma tipoOrig = generico->tipo;
 
                 if(idOrig >= IdIni && idOrig <= IdFim){
-                    int deveRemoverOriginal = 1;
 
                     if(tipoOrig == LINHA){
                         Linha l = (Linha) forma;
@@ -80,8 +79,6 @@ void lerArqQry(ListaFormas formas, char* caminhoQry, char* caminhoTxt, char* dir
                         Segmento s = criarSegmento(idSeg, getX1Linha(l), getY1Linha(l), getX2Linha(l), getY2Linha(l));
                         insereFinalLista(listaSegmento, s);
                         fprintf(arqTxt, "a: ID Orig: %d (%s) -> ID Seg: %d [(%.2f, %.2f) - (%.2f, %.2f)]\n", idOrig, getNomeTipo(tipoOrig), idSeg, getX1Linha(l), getY1Linha(l), getX2Linha(l), getY2Linha(l));
-                        
-                        deveRemoverOriginal = 0;
 
                     } else if(tipoOrig == CIRCULO){
                         Circulo c = (Circulo) forma;
@@ -146,11 +143,6 @@ void lerArqQry(ListaFormas formas, char* caminhoQry, char* caminhoTxt, char* dir
                         insereFinalLista(listaSegmento, s);
 
                         fprintf(arqTxt, "a: ID Orig: %d (%s) -> ID Seg: %d [(%.2f, %.2f) - (%.2f, %.2f)]\n", idOrig, getNomeTipo(tipoOrig), idSeg, x1, yt, x2, yt);
-                    }
-
-                    if(deveRemoverOriginal){
-                        removeNoLista(formas, noAtual);
-                        killFormaGenerica(forma, tipoOrig);
                     }
                 }
                 noAtual = proximoNo;
