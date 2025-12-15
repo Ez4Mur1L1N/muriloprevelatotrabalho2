@@ -22,6 +22,10 @@ double distSq(double x1, double y1, double x2, double y2){
     return (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2);
 }
 
+double produtoVetorial(double x1, double y1, double x2, double y2, double x3, double y3){
+    return (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1);
+}
+
 double obterDistancia(double xBomba, double yBomba, Segmento seg){
     double x1 = getX1Segmento(seg);
     double y1 = getY1Segmento(seg);
@@ -47,24 +51,50 @@ int compararSegmentos(Segmento segA, Segmento segB, double xBomba, double yBomba
     double distA = obterDistancia(xBomba, yBomba, segA);
     double distB = obterDistancia(xBomba, yBomba, segB);
 
-    // --- DEBUG TEMPORÁRIO (Remova depois) ---
-    // Vamos printar apenas se a distância for pequena, para não poluir demais
-    if (distA < 100 && distB < 100) {
-        printf("COMP: SegID %d (Dist %.2f) vs SegID %d (Dist %.2f)\n", getIDSegmento(segA), distA, getIDSegmento(segB), distB);
+    // Correção: critério - virada à direita ou à esquerda!!!
+    if(fabs(distA - distB) < 1e-9){
+        double ax1 = getX1Segmento(segA), ay1 = getY1Segmento(segA);
+        double ax2 = getX2Segmento(segA), ay2 = getY2Segmento(segA);
+        double bx1 = getX1Segmento(segB), by1 = getY1Segmento(segB);
+        double bx2 = getX2Segmento(segB), by2 = getY2Segmento(segB);
+
+        double cx, cy; // Ponto Comum.
+        double oxA, oyA; // Outro ponto de A.
+        double oxB, oyB; // Outro ponto de B.
+        int temComum = 0;
+
+        // Verifica todas as 4 combinações possíveis de conexão
+        if (fabs(ax1 - bx1) < 1e-9 && fabs(ay1 - by1) < 1e-9) { 
+            cx=ax1; cy=ay1; oxA=ax2; oyA=ay2; oxB=bx2; oyB=by2; temComum=1;
+        }
+        else if (fabs(ax1 - bx2) < 1e-9 && fabs(ay1 - by2) < 1e-9) { 
+            cx=ax1; cy=ay1; oxA=ax2; oyA=ay2; oxB=bx1; oyB=by1; temComum=1;
+        }
+        else if (fabs(ax2 - bx1) < 1e-9 && fabs(ay2 - by1) < 1e-9) { 
+            cx=ax2; cy=ay2; oxA=ax1; oyA=ay1; oxB=bx2; oyB=by2; temComum=1;
+        }
+        else if (fabs(ax2 - bx2) < 1e-9 && fabs(ay2 - by2) < 1e-9) { 
+            cx=ax2; cy=ay2; oxA=ax1; oyA=ay1; oxB=bx1; oyB=by1; temComum=1;
+        }
+
+        if (temComum) {
+            // Produto Vetorial usando o vértice comum como pivô.
+            // (V -> OutroB) em relação a (V -> OutroA),
+            double valor = produtoVetorial(cx, cy, oxA, oyA, oxB, oyB);
+            
+            // Se valor > 0, B está à "esquerda" (sentido anti-horário) de A.
+            if (valor > 0) return -1; // A é menor
+            if (valor < 0) return 1;  // A é maior (B está à direita de A)
+            return 0; // Colineares
+        }
+        
+        // Aí sim, para distâncias iguais vou usar ID como último recurso de comparação.
+        if(getIDSegmento(segA) < getIDSegmento(segB)) return -1;
+        return 1;
     }
 
-    // Para tratar distâncias muito pequenas(ou seja, iguais).
-    if(fabs(distA - distB)< 1e-9){
-        //Se as distâncias são iguais o desempate é pelo ID
-        int idA = getIDSegmento(segA);
-        int idB = getIDSegmento(segB);
-        if(idA < idB) return -1;
-        if(idA > idB) return 1;
-        return 0; // Segurança;
-    }
-
-    if(distA<distB) return -1; // A menor(mais próxima).
-    return 1; // B menor.
+    if(distA < distB) return -1; // A mais próximo.
+    return 1; // B mais próximo.
 }
 
 Arvore criarArvore(double xBomba, double yBomba){

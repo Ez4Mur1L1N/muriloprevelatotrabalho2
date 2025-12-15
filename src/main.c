@@ -109,7 +109,6 @@ int main(int argc, char *argv[]) {
         FILE* svgFinalBase = fopen(caminhoSvgFinal, "w");
         if(svgFinalBase){
             abreSVG(svgFinalBase);
-            processarListaSvg(svgFinalBase, formas);
             fclose(svgFinalBase);
         }
 
@@ -117,6 +116,7 @@ int main(int argc, char *argv[]) {
         
         FILE* svgFinalFim = fopen(caminhoSvgFinal, "a");
         if(svgFinalFim){
+            processarListaSvg(svgFinalFim, formas);
             fechaSVG(svgFinalFim);
             fclose(svgFinalFim);
         }
